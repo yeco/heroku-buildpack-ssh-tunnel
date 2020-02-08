@@ -55,7 +55,8 @@ if is_configured; then
   deploy_key
   spawn_tunnel
   if is_configured; then
-  spawn_second_tunnel
+    spawn_second_tunnel
+    log "second tunnel spawned";
   fi
   log "spawned";
 else
