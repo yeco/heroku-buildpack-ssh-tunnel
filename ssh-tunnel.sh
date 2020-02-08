@@ -32,6 +32,13 @@ function deploy_key {
   ssh-keyscan -p ${SSHTUNNEL_REMOTE_PORT} ${SSHTUNNEL_REMOTE_HOST} > ${HOME}/.ssh/known_hosts
 }
 
+function deploy_second_key {
+  echo "${SSHTUNNEL_PRIVATE_KEY}" > ${HOME}/.ssh/ssh-second-tunnel-key
+  chmod 600 ${HOME}/.ssh/ssh-second-tunnel-key
+
+  ssh-keyscan -p ${SSHTUNNEL_REMOTE_PORT} ${SSHTUNNEL_REMOTE_HOST} > ${HOME}/.ssh/known_hosts
+}
+
 function spawn_tunnel {
   while true; do
     log "ssh-connection-init"
@@ -40,10 +47,11 @@ function spawn_tunnel {
     sleep 5;
   done &
 }
+
 function spawn_second_tunnel {
   while true; do
     log "ssh-second-connection-init"
-    ssh -i ${HOME}/.ssh/ssh-tunnel-key -N -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -L ${SSHTUNNEL_SECOND_TUNNEL_CONFIG} ${SSHTUNNEL_REMOTE_USER}@${SSHTUNNEL_REMOTE_HOST} -p ${SSHTUNNEL_REMOTE_PORT}
+    ssh -i ${HOME}/.ssh/ssh-second-tunnel-key -N -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -L ${SSHTUNNEL_SECOND_TUNNEL_CONFIG} ${SSHTUNNEL_REMOTE_USER}@${SSHTUNNEL_REMOTE_HOST} -p ${SSHTUNNEL_REMOTE_PORT}
     log "ssh-second-connection-end"
     sleep 5;
   done &
@@ -55,6 +63,7 @@ if is_configured; then
   deploy_key
   spawn_tunnel
   if is_second_configured; then
+    deploy_second_key
     spawn_second_tunnel
     log "second tunnel spawned";
   fi
