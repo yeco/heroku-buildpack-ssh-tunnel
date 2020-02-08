@@ -15,6 +15,13 @@ function is_configured {
   ]] && return 0 || return 1
 }
 
+function is_second_configured {
+  [[ \
+    -v SSHTUNNEL_SECOND_TUNNEL_CONFIG
+  ]] && return 0 || return 1
+}
+
+
 function deploy_key {
   mkdir -p ${HOME}/.ssh
   chmod 700 ${HOME}/.ssh
@@ -33,13 +40,23 @@ function spawn_tunnel {
     sleep 5;
   done &
 }
+function spawn_second_tunnel {
+  while true; do
+    log "ssh-connection-init"
+    ssh -i ${HOME}/.ssh/ssh-tunnel-key -N -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -L ${SSHTUNNEL_SECOND_TUNNEL_CONFIG} ${SSHTUNNEL_REMOTE_USER}@${SSHTUNNEL_REMOTE_HOST} -p ${SSHTUNNEL_REMOTE_PORT}
+    log "ssh-connection-end"
+    sleep 5;
+  done &
+}
 
 log "starting"
 
 if is_configured; then
   deploy_key
   spawn_tunnel
-
+  if is_configured; then
+  spawn_second_tunnel
+  fi
   log "spawned";
 else
   log "missing-configuration"
