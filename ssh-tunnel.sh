@@ -62,11 +62,9 @@ log "starting"
 if is_configured; then
   deploy_key
   spawn_tunnel
-  if is_second_configured; then
-    deploy_second_key
-    spawn_second_tunnel
-    log "second tunnel spawned";
-  fi
+  deploy_second_key
+  spawn_second_tunnel
+  log "second tunnel spawned";
   log "spawned";
 else
   log "missing-configuration"
