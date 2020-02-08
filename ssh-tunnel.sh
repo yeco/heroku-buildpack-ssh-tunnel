@@ -42,9 +42,9 @@ function spawn_tunnel {
 }
 function spawn_second_tunnel {
   while true; do
-    log "ssh-connection-init"
+    log "ssh-second-connection-init"
     ssh -i ${HOME}/.ssh/ssh-tunnel-key -N -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -L ${SSHTUNNEL_SECOND_TUNNEL_CONFIG} ${SSHTUNNEL_REMOTE_USER}@${SSHTUNNEL_REMOTE_HOST} -p ${SSHTUNNEL_REMOTE_PORT}
-    log "ssh-connection-end"
+    log "ssh-second-connection-end"
     sleep 5;
   done &
 }
@@ -54,7 +54,7 @@ log "starting"
 if is_configured; then
   deploy_key
   spawn_tunnel
-  if is_configured; then
+  if is_second_configured; then
     spawn_second_tunnel
     log "second tunnel spawned";
   fi
